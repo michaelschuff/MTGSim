@@ -1,0 +1,44 @@
+plugins {
+    id 'systems.manifold.manifold-gradle-plugin' version '0.0.2-alpha'
+}
+
+group 'systems.manifold'
+version '1.0-SNAPSHOT'
+
+targetCompatibility = 11
+sourceCompatibility = 11
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}
+
+configurations {
+    // give tests access to annotationProcessor dependencies
+    testImplementation.extendsFrom annotationProcessor
+}
+
+manifold {
+    manifoldVersion = '2025.1.12'
+}
+
+dependencies {
+    implementation "systems.manifold:manifold-json-rt:${manifold.manifoldVersion.get()}"
+    implementation "systems.manifold:manifold-props-rt:${manifold.manifoldVersion.get()}"
+    implementation "systems.manifold:manifold-ext-rt:${manifold.manifoldVersion.get()}"
+    implementation "systems.manifold:manifold-tuple-rt:${manifold.manifoldVersion.get()}"
+    implementation "systems.manifold:manifold-params-rt:${manifold.manifoldVersion.get()}"
+    implementation("com.google.guava:guava:33.4.8-jre")
+    testImplementation 'junit:junit:4.13.1'
+    annotationProcessor "systems.manifold:manifold-json:${manifold.manifoldVersion.get()}"
+    annotationProcessor "systems.manifold:manifold-props:${manifold.manifoldVersion.get()}"
+    annotationProcessor "systems.manifold:manifold-ext:${manifold.manifoldVersion.get()}"
+    annotationProcessor "systems.manifold:manifold-tuple:${manifold.manifoldVersion.get()}"
+    annotationProcessor "systems.manifold:manifold-params:${manifold.manifoldVersion.get()}"
+}
+
+//tasks.withType(JavaCompile) {
+//    options.fork = true
+//    options.forkOptions.executable = System.properties['java.home'] + '/bin/javac'
+//}
