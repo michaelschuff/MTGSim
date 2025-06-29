@@ -1,10 +1,7 @@
 package org.koi;
 
 
-import org.koi.gameobject.MTGCard;
-import org.koi.gameobject.cards.LegionsInitiative;
-import org.koi.gameobject.cards.OnakkeOgre;
-import org.koi.gameobject.cards.WishcoinCrab;
+import org.koi.game.KoiSimulator;
 import org.koi.util.Variant;
 
 import java.util.ArrayList;
@@ -14,18 +11,33 @@ public class Main {
     public static void main(String[] args) {
 
         // TODO: get decks from players
-        List<MTGCard> deck1 = new ArrayList<>();
-        deck1.add(OnakkeOgre.getCard());
-        deck1.add(WishcoinCrab.getCard());
-        deck1.add(LegionsInitiative.getCard());
+        List<String> deck1 = new ArrayList<>();
+        deck1.add("OnakkeOgre");
+        deck1.add("WishcoinCrab");
+        deck1.add("LegionsInitiative");
+        deck1.add("Mountain");
+        deck1.add("Plains");
+        deck1.add("Swamp");
+        deck1.add("Forest");
+        deck1.add("Island");
+        deck1.add("Mountain");
+        deck1.add("Plains");
 
-        List<MTGCard> deck2 = new ArrayList<>();
-        deck2.add(OnakkeOgre.getCard());
-        deck2.add(WishcoinCrab.getCard());
-        deck2.add(LegionsInitiative.getCard());
+
+        List<String> deck2 = new ArrayList<>();
+        deck2.add("OnakkeOgre");
+        deck2.add("WishcoinCrab");
+        deck2.add("LegionsInitiative");
+        deck2.add("Mountain");
+        deck2.add("Plains");
+        deck2.add("Swamp");
+        deck2.add("Forest");
+        deck2.add("Island");
+        deck2.add("Mountain");
+        deck2.add("Plains");
 
 
-        Thread thread = new Thread(new KoiSimulator(Variant.Standard, List.of(deck1, deck2)));
-        thread.start();
+        KoiSimulator sim = new KoiSimulator(Variant.Standard, List.of(deck1, deck2));
+        sim.run();
     }
 }

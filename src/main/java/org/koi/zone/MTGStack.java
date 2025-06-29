@@ -1,7 +1,9 @@
 package org.koi.zone;
 
 
-public class MTGStack extends AbstractZone {
+import org.koi.gameobject.GameObject;
+
+public class MTGStack extends AbstractZone<GameObject> {
 
     @Override
     public ZONE getType() {

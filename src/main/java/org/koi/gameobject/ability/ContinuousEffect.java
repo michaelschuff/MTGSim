@@ -1,48 +1,42 @@
 package org.koi.gameobject.ability;
 
 import org.koi.LAYER;
-import org.koi.MTGGame;
-import org.koi.gameobject.Card;
+import org.koi.game.MTGGame;
+import org.koi.gameobject.card.Card;
 import org.koi.modification.Modification;
-import org.koi.util.OID;
+import org.koi.util.Player;
 
 import java.util.List;
 import java.util.function.Function;
 
-public class ContinuousEffect implements Comparable<ContinuousEffect> {
-    public int controller;
+public class ContinuousEffect {
+    public Player controller;
     public Modification effect;
     public Card source;
-    public Function<Integer, List<OID>> filter;
-    public List<OID> affectedObjects = null;
+    public Function<Card, List<Card>> filter;
+    public List<Card> affectedObjects = null;
+    public final MTGGame game;
 
-    public ContinuousEffect(int controller,
+    public ContinuousEffect(MTGGame game,
+                            Card source,
                             Modification e,
-                            Card s,
-                            Function<Integer, List<OID>> filter) {
-        this.controller = controller;
+                            Function<Card, List<Card>> filter) {
+        this.game = game;
+        this.controller = source.controller;
         this.effect = e;
-        this.source = s;
+        this.source = source;
         this.filter = filter;
     }
     public void selectAffectedObjects() {
         if (affectedObjects == null) {
-            this.affectedObjects = this.filter.apply(controller);
+            this.affectedObjects = this.filter.apply(source);
         }
     }
 
     public void applyToObjects(LAYER l) {
         assert affectedObjects != null;
-        for (OID id : affectedObjects) {
-            Card c = MTGGame.data().getCard(id);
-            c = effect.apply(c, l);
-            MTGGame.data().setCard(id, c);
+        for (Card c : affectedObjects) {
+            effect.apply(c, l);
         }
-    }
-
-
-    @Override
-    public int compareTo(ContinuousEffect o) {
-        return 0;
     }
 }

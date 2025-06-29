@@ -1,5 +1,7 @@
 package org.koi.util;
 
+import org.koi.mana.Mana;
+
 public class Color {
 
 
@@ -52,6 +54,15 @@ public class Color {
         }
 
         return str.substring(0, str.length()-1);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Color c = (Color) o;
+        return value == c.value;
     }
 
     public static final Color COLORLESS = new Color(0);

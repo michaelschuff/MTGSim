@@ -1,5 +1,6 @@
 package org.koi.modification.mods;
 
+import org.koi.game.MTGGame;
 import org.koi.gameobject.PowTou;
 import org.koi.modification.Modifier;
 

@@ -1,11 +1,17 @@
 package org.koi.counters;
 
+import org.koi.game.MTGGame;
+
 import java.util.HashMap;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 
 public class CounterStore {
+    public final MTGGame game;
+    public CounterStore(MTGGame game) {
+        this.game = game;
+    }
     private final HashMap<Counter, Integer> data = new HashMap<>();
 
     public void inc(Counter counter, int amount = 1) {

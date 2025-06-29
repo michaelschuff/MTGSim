@@ -1,7 +1,7 @@
 package org.koi.modification.mods;
 
 
-import org.koi.gameobject.Card;
+import org.koi.gameobject.card.Card;
 import org.koi.modification.Modifier;
 
 

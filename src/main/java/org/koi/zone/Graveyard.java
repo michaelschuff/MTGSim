@@ -1,6 +1,8 @@
 package org.koi.zone;
 
-public class Graveyard extends AbstractZone {
+import org.koi.gameobject.card.Card;
+
+public class Graveyard extends AbstractZone<Card> {
 
     @Override
     public ZONE getType() {

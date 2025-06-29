@@ -1,23 +1,35 @@
 package org.koi.event;
 
-import org.koi.util.OID;
-
-import java.util.function.Function;
+import org.koi.game.MTGGame;
+import org.koi.gameobject.card.Card;
+import org.koi.util.GameObjectOrPlayer;
+import org.koi.util.Player;
 
 public abstract class Event {
-    public final boolean isRevertible;
-    public final boolean doesTarget;
-    public final Function<OID, Boolean> filter;
+    // draw a card and gain 2 life
+    // this event will draw a card,
+    // 'next' event will gain 2 life
+    public GameObjectOrPlayer source;
+    public final MTGGame game;
 
-
-    public abstract void ApplyAction();
-
-    public Event(boolean isRevertible,
-                 Function<OID, Boolean> filter,
-                 boolean doesTarget) {
-        this.isRevertible = isRevertible;
-        this.doesTarget = doesTarget;
-        this.filter = filter;
+    public Event(MTGGame game) {
+        this.game = game;
+        this.source = null;
+    }
+    public Event(MTGGame game, Card source) {
+        this.game = game;
+        this.source = new GameObjectOrPlayer(source);
+    }
+    public Event(MTGGame game, GameObjectOrPlayer source) {
+        this.game = game;
+        this.source = source;
+    }
+    public Event(MTGGame game, Player source) {
+        this.game = game;
+        this.source = new GameObjectOrPlayer(source);
     }
 
+    public abstract boolean resolve();
+
+    
 }

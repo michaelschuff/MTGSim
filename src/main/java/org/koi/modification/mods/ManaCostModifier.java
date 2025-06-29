@@ -1,13 +1,13 @@
 package org.koi.modification.mods;
 
-import org.koi.mana.ManaCost;
-import org.koi.mana.ManaCostBuilder;
+import org.koi.cost.ManaCost;
+import org.koi.cost.ManaCostBuilder;
 import org.koi.modification.Modifier;
 
 public abstract class ManaCostModifier extends Modifier<ManaCost> {
     private final MOD_TYPE mode;
 
-    protected ManaCostModifier(ManaCost value, MOD_TYPE m) {
+    protected ManaCostModifier(MOD_TYPE m) {
         this.mode  = m;
     }
 
@@ -25,4 +25,6 @@ public abstract class ManaCostModifier extends Modifier<ManaCost> {
                 throw new IllegalStateException("Unexpected value: " + this.mode);
         }
     }
+
+
 }

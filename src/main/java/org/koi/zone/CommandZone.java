@@ -1,6 +1,8 @@
 package org.koi.zone;
 
-public class CommandZone extends AbstractZone {
+import org.koi.gameobject.card.Card;
+
+public class CommandZone extends AbstractZone<Card> {
 
     @Override
     public ZONE getType() {

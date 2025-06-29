@@ -15,6 +15,9 @@ public class TurnController {
     }
 
 
+
+
+
     // Resets priority to AP
     public void ResetPriority() {
         playerPriorityIndex = playerCounter.getWhoseTurn();

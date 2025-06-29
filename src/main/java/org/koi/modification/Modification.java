@@ -2,11 +2,12 @@ package org.koi.modification;
 
 
 import org.koi.LAYER;
-import org.koi.gameobject.ability.Ability;
-import org.koi.gameobject.Card;
+import org.koi.game.MTGGame;
+import org.koi.gameobject.card.Card;
 import org.koi.modification.mods.*;
 
 public class Modification {
+    public final MTGGame game;
     public final LAYER lowestLayer;
     // ==========================================================================================
     // Layer 1 - Copiable Value Changing Effects
@@ -22,9 +23,9 @@ public class Modification {
 //    AbilityModifier copiable_textModifier; <- how the fuck
     public final PowTouModifier clonePowTouModifier;
     public final IntModifier cloneLoyaltyModifier;
-    public final ListModifier<Ability> cloneAddAbilityModifier;
-    public final ListModifier<Ability> cloneRemoveAbilityModifier;
-    public final ListModifier<Ability> cloneCannotGainAbilityModifier;
+    public final CardAbilitiesModifier cloneAddAbilityModifier;
+    public final CardAbilitiesModifier cloneRemoveAbilityModifier;
+    public final CardAbilitiesModifier cloneCannotGainAbilityModifier;
 
 
     // Layer 1b - Face-down spells and permanents
@@ -61,13 +62,13 @@ public class Modification {
 
     //might need to be AbilityListModifier
     // for determining if abilities are equal.
-    public final ListModifier<Ability> addAbilityModifier;
-    public final ListModifier<Ability> keywordCounterAbilityModifier;
-    public final ListModifier<Ability> removeAbilityModifier;
+    public final CardAbilitiesModifier addAbilityModifier;
+    public final CardAbilitiesModifier keywordCounterAbilityModifier;
+    public final CardAbilitiesModifier removeAbilityModifier;
 
     // doesn't modify ability list. Separate list that keeps track of what abilities a card can gain
     // add ability might depend on this.
-    public final ListModifier<Ability> cannotGainAbilityModifier;
+    public final CardAbilitiesModifier cannotGainAbilityModifier;
 
 
     // ==========================================================================================
@@ -94,7 +95,7 @@ public class Modification {
         switch (l) {
             case L1a:
                 if (cloneModifier != null)
-                    c = this.cloneModifier.apply(c);
+                    this.cloneModifier.apply(c);
                 if (cloneNameModifier != null)
                     c.name = this.cloneNameModifier.apply(c.name);
                 if (cloneManaCostModifier != null)
@@ -121,7 +122,7 @@ public class Modification {
                 return c;
             case L2:
                 if (controllerModifier != null)
-                    c.controller = this.controllerModifier.apply(c.controller);
+                    c.controller = game.data.players.get(this.controllerModifier.apply(c.controller.index));
                 return c;
             case L3:
                 return c;
@@ -165,28 +166,30 @@ public class Modification {
     }
 
 
-    public Modification(CardModifier cloneModifier,
+    public Modification(MTGGame game,
+                        CardModifier cloneModifier,
                         StringModifier cloneNameModifier,
                         ManaCostModifier cloneManaCostModifier,
                         ColorModifier cloneColorModifier,
                         TypelineModifier cloneTypelineModifier,
                         PowTouModifier clonePowTouModifier,
                         IntModifier cloneLoyaltyModifier,
-                        ListModifier<Ability> cloneAddAbilityModifier,
-                        ListModifier<Ability> cloneRemoveAbilityModifier,
-                        ListModifier<Ability> cloneCannotGainAbilityModifier,
+                        CardAbilitiesModifier cloneAddAbilityModifier,
+                        CardAbilitiesModifier cloneRemoveAbilityModifier,
+                        CardAbilitiesModifier cloneCannotGainAbilityModifier,
                         IntModifier controllerModifier,
                         TypelineModifier typeModifier,
                         ColorModifier colorModifier,
-                        ListModifier<Ability> addAbilityModifier,
-                        ListModifier<Ability> keywordCounterAbilityModifier,
-                        ListModifier<Ability> removeAbilityModifier,
-                        ListModifier<Ability> cannotGainAbilityModifier,
+                        CardAbilitiesModifier addAbilityModifier,
+                        CardAbilitiesModifier keywordCounterAbilityModifier,
+                        CardAbilitiesModifier removeAbilityModifier,
+                        CardAbilitiesModifier cannotGainAbilityModifier,
                         PowTouModifier powerToughnessDefiner,
                         PowTouModifier basePowerToughnessModifier,
                         PowTouModifier powerToughnessModifier,
                         PowTouModifier powerToughnessSwap,
                         LAYER lowestLayer) {
+        this.game = game;
         this.cloneModifier = cloneModifier;
         this.cloneNameModifier = cloneNameModifier;
         this.cloneManaCostModifier = cloneManaCostModifier;

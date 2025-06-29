@@ -1,7 +1,9 @@
 package org.koi.zone;
 
 
-public class Battlefield extends AbstractZone {
+import org.koi.gameobject.card.Card;
+
+public class Battlefield extends AbstractZone<Card> {
     public void resetCards() {
         this.forEach((id) -> {
             // TODO: get card by id

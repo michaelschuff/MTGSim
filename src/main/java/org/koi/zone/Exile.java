@@ -1,6 +1,8 @@
 package org.koi.zone;
 
-public class Exile extends AbstractZone {
+import org.koi.gameobject.card.Card;
+
+public class Exile extends AbstractZone<Card> {
 
     @Override
     public ZONE getType() {

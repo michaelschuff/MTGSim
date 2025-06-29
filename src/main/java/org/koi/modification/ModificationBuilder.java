@@ -1,10 +1,13 @@
 package org.koi.modification;
 
 import org.koi.LAYER;
+import org.koi.game.MTGGame;
 import org.koi.gameobject.ability.Ability;
 import org.koi.modification.mods.*;
 
 public class ModificationBuilder {
+
+    public final MTGGame game;
     private LAYER lowestLayer = LAYER.L7d;
     // ==========================================================================================
     // Layer 1 - Copiable Value Changing Effects
@@ -21,9 +24,9 @@ public class ModificationBuilder {
     //    AbilityModifier copiable_textModifier; <- how the fuck
     private PowTouModifier clonePowTouModifier;
     private IntModifier cloneLoyaltyModifier;
-    private ListModifier<Ability> cloneAddAbilityModifier;
-    private ListModifier<Ability> cloneRemoveAbilityModifier;
-    private ListModifier<Ability> cloneCannotGainAbilityModifier;
+    private CardAbilitiesModifier cloneAddAbilityModifier;
+    private CardAbilitiesModifier cloneRemoveAbilityModifier;
+    private CardAbilitiesModifier cloneCannotGainAbilityModifier;
 
 
     // Layer 1b - Face-down spells and permanents
@@ -60,13 +63,13 @@ public class ModificationBuilder {
 
     //might need to be AbilityListModifier
     // for determining if abilities are equal.
-    private ListModifier<Ability> addAbilityModifier;
-    private ListModifier<Ability> keywordCounterAbilityModifier;
-    private ListModifier<Ability> removeAbilityModifier;
+    private CardAbilitiesModifier addAbilityModifier;
+    private CardAbilitiesModifier keywordCounterAbilityModifier;
+    private CardAbilitiesModifier removeAbilityModifier;
 
     // doesn't modify ability list. Separate list that keeps track of what abilities a card can gain
     // add ability might depend on this.
-    private ListModifier<Ability> cannotGainAbilityModifier;
+    private CardAbilitiesModifier cannotGainAbilityModifier;
 
 
     // ==========================================================================================
@@ -121,17 +124,17 @@ public class ModificationBuilder {
         lowestLayer = LAYER.L1a;
         return this;
     }
-    public ModificationBuilder addCloneAddAbilityMod(ListModifier<Ability> m) {
+    public ModificationBuilder addCloneAddAbilityMod(CardAbilitiesModifier m) {
         this.cloneAddAbilityModifier = m;
         lowestLayer = LAYER.L1a;
         return this;
     }
-    public ModificationBuilder addCloneRemoveAbilityMod(ListModifier<Ability> m) {
+    public ModificationBuilder addCloneRemoveAbilityMod(CardAbilitiesModifier m) {
         this.cloneRemoveAbilityModifier = m;
         lowestLayer = LAYER.L1a;
         return this;
     }
-    public ModificationBuilder addCloneCannotGainAbilityMod(ListModifier<Ability> m) {
+    public ModificationBuilder addCloneCannotGainAbilityMod(CardAbilitiesModifier m) {
         this.cloneCannotGainAbilityModifier = m;
         lowestLayer = LAYER.L1a;
         return this;
@@ -154,25 +157,25 @@ public class ModificationBuilder {
             lowestLayer = LAYER.L5;
         return this;
     }
-    public ModificationBuilder addAddAbilityMod(ListModifier<Ability> m) {
+    public ModificationBuilder addAddAbilityMod(CardAbilitiesModifier m) {
         this.addAbilityModifier = m;
         if (lowestLayer.ordinal() > LAYER.L6.ordinal())
             lowestLayer = LAYER.L6;
         return this;
     }
-    public ModificationBuilder addKeywordCounterAbilityMod(ListModifier<Ability> m) {
+    public ModificationBuilder addKeywordCounterAbilityMod(CardAbilitiesModifier m) {
         this.keywordCounterAbilityModifier = m;
         if (lowestLayer.ordinal() > LAYER.L6.ordinal())
             lowestLayer = LAYER.L6;
         return this;
     }
-    public ModificationBuilder addRemoveAbilityMod(ListModifier<Ability> m) {
+    public ModificationBuilder addRemoveAbilityMod(CardAbilitiesModifier m) {
         this.removeAbilityModifier = m;
         if (lowestLayer.ordinal() > LAYER.L6.ordinal())
             lowestLayer = LAYER.L6;
         return this;
     }
-    public ModificationBuilder addCannotGainAbilityMod(ListModifier<Ability> m) {
+    public ModificationBuilder addCannotGainAbilityMod(CardAbilitiesModifier m) {
         this.cannotGainAbilityModifier = m;
         if (lowestLayer.ordinal() > LAYER.L6.ordinal())
             lowestLayer = LAYER.L6;
@@ -203,8 +206,14 @@ public class ModificationBuilder {
             lowestLayer = LAYER.L7d;
         return this;
     }
+
+    public ModificationBuilder(MTGGame game) {
+        this.game = game;
+    }
+
     public Modification build() {
         return new Modification(
+                game,
                 cloneModifier,
                 cloneNameModifier,
                 cloneManaCostModifier,
