@@ -155,6 +155,10 @@ public class MTGGame {
                                             System.out.println("Activate ability cancelled.");
                                             break;
                                         }
+
+
+                                        eventManager.addEvents(source.abilities.activatedAbilities.get(ability_choice).cost);
+                                        updateBoardState();
                                         eventManager.addEvent(
                                                 new ActivateAbilityEvent(
                                                         this, source, prio_player,

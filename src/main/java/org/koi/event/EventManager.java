@@ -17,12 +17,15 @@ public class EventManager {
         this.events = new ArrayList<>();
     }
 
-    public void addEvents(List<Event> events) {
+    public void addEvents(List<? extends Event> events) {
+        for (Event e : events) {
+            System.out.println("Event added: " + e.getClass().getCanonicalName());
+        }
         this.events.addAll(events);
     }
 
     public void addEvent(Event e) {
-//        System.out.println("Event added: " + e.getClass().getCanonicalName());
+        System.out.println("Event added: " + e.getClass().getCanonicalName());
         this.events.add(e);
     }
 

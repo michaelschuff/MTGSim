@@ -22,7 +22,7 @@ public class TapSelfCostEvent extends CostEvent {
 
     @Override
     public void pay(Player player) {
-
+        source.status.tapped = true;
     }
 
     @Override

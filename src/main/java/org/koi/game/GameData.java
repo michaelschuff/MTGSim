@@ -338,7 +338,12 @@ public class GameData {
         StringBuilder s = new StringBuilder("Current Game State:");
         s.append("\n\t Battlefield:");
         if (battlefield.isEmpty()) s.append(" <empty>");
-        for (Card c : battlefield) s.append("\n\t\t").append(c.name);
+        for (Card c : battlefield) {
+            s.append("\n\t\t").append(c.name);
+            if (c.status.tapped) {
+                s.append(" (Tapped)");
+            }
+        }
 
         s.append("\n\t Stack:");
         if (theStack.isEmpty()) s.append(" <empty>");
