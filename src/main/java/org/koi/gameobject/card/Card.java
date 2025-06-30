@@ -1,9 +1,10 @@
 package org.koi.gameobject.card;
 
 
-import org.koi.cost.ManaCost;
+import org.koi.gameobject.cost.ManaCost;
 import org.koi.gameobject.GameObject;
 import org.koi.gameobject.PowTou;
+import org.koi.gameobject.counters.CounterStore;
 import org.koi.util.Color;
 import org.koi.gameobject.typeline.Typeline;
 import org.koi.util.Player;
@@ -19,6 +20,9 @@ public class Card extends GameObject {
     public ManaCost manaCost;
     public CardStatus status;
     public CardAbilities abilities;
+    public final boolean isToken;
+    public final boolean isSpellCopy;
+    public CounterStore counters;
 
     public Player controller;
     public final Player owner;
@@ -38,6 +42,29 @@ public class Card extends GameObject {
         this.controller = creator;
         this.owner = creator;
         this.abilities = original.abilities.generate(this);
+        this.isToken = false;
+        this.isSpellCopy = false;
+        counters = new CounterStore();
+    }
+    public Card(OracleCard original,
+                Player creator,
+                int timestamp,
+                boolean isToken,
+                boolean isSpellCopy) {
+        super(timestamp);
+        this.original = original;
+        this.name = original.name;
+        this.pt = new PowTou(original.power, original.toughness);
+        this.color = original.color;
+        this.typeline = original.typeline;
+        this.manaCost = original.manaCost;
+        this.status = new CardStatus();
+        this.controller = creator;
+        this.owner = creator;
+        this.abilities = original.abilities.generate(this);
+        this.isToken = isToken;
+        this.isSpellCopy = isSpellCopy;
+        counters = new CounterStore();
     }
 
 

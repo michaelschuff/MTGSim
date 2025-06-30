@@ -1,11 +1,9 @@
 package org.koi.event.status;
 
-import org.koi.cost.Payable;
 import org.koi.game.MTGGame;
 import org.koi.event.Event;
 import org.koi.gameobject.card.Card;
-import org.koi.util.Player;
-import org.koi.zone.ZONE;
+import org.koi.game.zone.ZONE;
 
 public class TapCardEvent extends Event {
     public Card c;

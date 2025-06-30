@@ -14,6 +14,8 @@ public class CardStatus {
     public boolean attacking    = false;
     public boolean blocking     = false;
 
+    public boolean recievedDeathtouchDamageFlag = false;
+
     public int                  damage              = 0;
     public List<Card>           inCombatWith        = List.of();
     public List<Integer>        damageAssignment    = List.of();

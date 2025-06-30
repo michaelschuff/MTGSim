@@ -1,15 +1,15 @@
 package org.koi.game;
 
 import org.koi.LAYER;
+import org.koi.game.zone.*;
 import org.koi.gameobject.*;
 import org.koi.gameobject.ability.*;
 import org.koi.gameobject.card.CARD_STATUS_TYPE;
 import org.koi.gameobject.card.Card;
 import org.koi.gameobject.card.OracleCard;
-import org.koi.mana.Mana;
+import org.koi.gameobject.mana.Mana;
 import org.koi.util.OID;
 import org.koi.util.Player;
-import org.koi.zone.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,32 +25,34 @@ public class GameData {
     public final HashMap<OID, StackAbility> abilityMap;
     public final List<Player> players;
     public final TimestampGenerator timestampGen;
+    public List<ContinuousEffect> continuousEffects;
 
 
     public GameData(MTGGame game) {
         this.game = game;
-        this.battlefield = new Battlefield();
-        this.theStack = new MTGStack();
-        this.exile = new Exile();
-        this.commandZone = new CommandZone();
+        battlefield = new Battlefield();
+        theStack = new MTGStack();
+        exile = new Exile();
+        commandZone = new CommandZone();
 
-        this.timestampGen = new TimestampGenerator();
+        timestampGen = new TimestampGenerator();
 
-        this.cardMap = new HashMap<>();
-        this.abilityMap = new HashMap<>();
-        this.players = new ArrayList<>();
+        cardMap = new HashMap<>();
+        abilityMap = new HashMap<>();
+        players = new ArrayList<>();
+        continuousEffects = List.of();
     }
 
     public void setLibraries(List<List<OracleCard>> decklists) {
         int timestamp = timestampGen.getNew();
         for (List<OracleCard> deck : decklists) {
-            int i = this.players.size();
-            this.players.add(new Player(i));
+            int i = players.size();
+            players.add(new Player(i));
 
             for (OracleCard mtgCard : deck) {
-                Card c = new Card(mtgCard, this.players.get(i), timestamp);
-                this.players.get(i).data.library.push(c);
-                this.cardMap.put(c.id, c);
+                Card c = new Card(mtgCard, players.get(i), timestamp);
+                players.get(i).data.library.push(c);
+                cardMap.put(c.id, c);
             }
         }
     }
@@ -155,8 +157,13 @@ public class GameData {
             for (StaticAbility a : c.abilities.staticAbilities) {
                 if (a instanceof StaticModifierAbility) {
                     StaticModifierAbility sa = (StaticModifierAbility) a;
-                    if (sa.condition.apply(c)) {
-                        ContinuousEffect e = new ContinuousEffect(game, c, sa.mod, sa.filter);
+                    if (sa.conditionalSuffix()) {
+                        ContinuousEffect e = new ContinuousEffect(game, c, sa.mod) {
+                            @Override
+                            public List<Card> getSubjects() {
+                                return sa.getSubjects();
+                            }
+                        };
                         ret.add(e);
                     }
                 }
@@ -209,7 +216,7 @@ public class GameData {
 
         // LAYER 1a
         for (ContinuousEffect e : layer1a_StaticEffects) {
-            e.selectAffectedObjects();
+            e.setAffectedObjects();
         }
         while (!layer1a_StaticEffects.isEmpty()) {
             sortContinuousEffects(layer1a_StaticEffects);
@@ -223,7 +230,7 @@ public class GameData {
 
         // LAYER 2
         for (ContinuousEffect e : layer2_StaticEffects) {
-            e.selectAffectedObjects();
+            e.setAffectedObjects();
         }
         while (!layer2_StaticEffects.isEmpty()) {
             sortContinuousEffects(layer2_StaticEffects);
@@ -236,7 +243,7 @@ public class GameData {
 
         // LAYER 4
         for (ContinuousEffect e : layer4_StaticEffects) {
-            e.selectAffectedObjects();
+            e.setAffectedObjects();
         }
         while (!layer4_StaticEffects.isEmpty()) {
             sortContinuousEffects(layer4_StaticEffects);
@@ -248,7 +255,7 @@ public class GameData {
 
         //LAYER 5
         for (ContinuousEffect e : layer5_StaticEffects) {
-            e.selectAffectedObjects();
+            e.setAffectedObjects();
         }
         while (!layer5_StaticEffects.isEmpty()) {
             sortContinuousEffects(layer5_StaticEffects);
@@ -260,7 +267,7 @@ public class GameData {
 
         //LAYER 6
         for (ContinuousEffect e : layer6_StaticEffects) {
-            e.selectAffectedObjects();
+            e.setAffectedObjects();
         }
         while (!layer6_StaticEffects.isEmpty()) {
             sortContinuousEffects(layer6_StaticEffects);
@@ -273,7 +280,7 @@ public class GameData {
 
         //LAYER 7a
         for (ContinuousEffect e : layer7a_StaticEffects) {
-            e.selectAffectedObjects();
+            e.setAffectedObjects();
         }
         while (!layer7a_StaticEffects.isEmpty()) {
             sortContinuousEffects(layer7a_StaticEffects);
@@ -284,7 +291,7 @@ public class GameData {
         }
         //LAYER 7b
         for (ContinuousEffect e : layer7b_StaticEffects) {
-            e.selectAffectedObjects();
+            e.setAffectedObjects();
         }
         while (!layer7b_StaticEffects.isEmpty()) {
             sortContinuousEffects(layer7b_StaticEffects);
@@ -296,7 +303,7 @@ public class GameData {
 
         //LAYER 7c
         for (ContinuousEffect e : layer7c_StaticEffects) {
-            e.selectAffectedObjects();
+            e.setAffectedObjects();
         }
         while (!layer7c_StaticEffects.isEmpty()) {
             sortContinuousEffects(layer7c_StaticEffects);
@@ -310,7 +317,7 @@ public class GameData {
 
         //LAYER 7d
         for (ContinuousEffect e : layer7d_StaticEffects) {
-            e.selectAffectedObjects();
+            e.setAffectedObjects();
         }
         while (!layer7d_StaticEffects.isEmpty()) {
             sortContinuousEffects(layer7d_StaticEffects);
@@ -372,5 +379,10 @@ public class GameData {
             for (Mana m : p.data.manaPool) s.append(m.color.toString());
         }
         return s.toString();
+    }
+
+
+    public void addDisconnectedContinuousEffect(ContinuousEffect e) {
+        continuousEffects.add(e);
     }
 }

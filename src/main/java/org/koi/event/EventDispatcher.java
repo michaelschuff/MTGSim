@@ -1,14 +1,16 @@
 package org.koi.event;
 
+import org.koi.event.turn.PlayerGainPriorityEvent;
 import org.koi.event.turn.TemporalEvent;
+import org.koi.event.turn.combat.DeclareAttackersStepBeginEvent;
 import org.koi.game.MTGGame;
 
 import java.util.*;
 
 public class EventDispatcher {
     public final MTGGame game;
-    private final HashMap<Class<? extends Event>, List<EventListener>> triggeredAbilityListeners;
-    private final HashMap<Class<? extends Event>, List<EventListener>> turnBasedActionListeners;
+    public final HashMap<Class<? extends Event>, List<EventListener>> triggeredAbilityListeners;
+    public final HashMap<Class<? extends Event>, List<EventListener>> turnBasedActionListeners;
 
     public EventDispatcher(MTGGame game) {
         this.game = game;
@@ -25,16 +27,21 @@ public class EventDispatcher {
     }
 
     public void dispatch(Event event) {
-        if (this.turnBasedActionListeners.containsKey(event.getClass())) {
-            for (EventListener listener : this.turnBasedActionListeners.get(event.getClass())) {
-                listener.accept(game, event);
-            }
-        }
-        if (this.triggeredAbilityListeners.containsKey(event.getClass())) {
-            for (EventListener listener : this.triggeredAbilityListeners.get(event.getClass())) {
-                listener.accept(game, event);
-            }
-        }
+        System.out.println("Dispatching event:" + event.getClass());
+        turnBasedActionListeners.entrySet().stream()
+                .filter( e -> e.getKey().isAssignableFrom(event.getClass()))
+                .forEach( e -> {
+                    for (EventListener listener : e.getValue()) {
+                        listener.accept(game, event);
+                    }
+                });
+        triggeredAbilityListeners.entrySet().stream()
+                .filter( e -> e.getKey().isAssignableFrom(event.getClass()))
+                .forEach( e -> {
+                    for (EventListener listener : e.getValue()) {
+                        listener.accept(game, event);
+                    }
+                });
     }
 
     public void clearTriggeredAbilityListeners() {

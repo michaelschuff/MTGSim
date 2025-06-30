@@ -1,7 +1,7 @@
 package org.koi.modification.mods;
 
-import org.koi.cost.ManaCost;
-import org.koi.cost.ManaCostBuilder;
+import org.koi.gameobject.cost.ManaCost;
+import org.koi.gameobject.cost.ManaCostBuilder;
 import org.koi.modification.Modifier;
 
 public abstract class ManaCostModifier extends Modifier<ManaCost> {

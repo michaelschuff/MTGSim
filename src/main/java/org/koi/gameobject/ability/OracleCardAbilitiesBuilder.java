@@ -14,20 +14,20 @@ public class OracleCardAbilitiesBuilder {
     private final List<Function<Card, TriggeredAbility>> triggeredAbilities = new ArrayList<>();
     private final List<Function<Card, StaticAbility>> staticAbilities = new ArrayList<>();
 
-    public OracleCardAbilitiesBuilder addActivatedAbility(Function<Card, ActivatedAbility> a) {
-        activatedAbilities.add(a);
+    public OracleCardAbilitiesBuilder addActivatedAbility(Function<Card, ActivatedAbility> aaGenerator) {
+        activatedAbilities.add(aaGenerator);
         return this;
     }
-    public OracleCardAbilitiesBuilder addSpellAbility(Function<Card, SpellAbility> a) {
-        spellAbilities.add(a);
+    public OracleCardAbilitiesBuilder addSpellAbility(Function<Card, SpellAbility> saGenerator) {
+        spellAbilities.add(saGenerator);
         return this;
     }
-    public OracleCardAbilitiesBuilder addTriggeredAbility(Function<Card, TriggeredAbility> a) {
-        triggeredAbilities.add(a);
+    public OracleCardAbilitiesBuilder addTriggeredAbility(Function<Card, TriggeredAbility> taGenerator) {
+        triggeredAbilities.add(taGenerator);
         return this;
     }
-    public OracleCardAbilitiesBuilder addStaticAbility(Function<Card, StaticAbility> a) {
-        staticAbilities.add(a);
+    public OracleCardAbilitiesBuilder addStaticAbility(Function<Card, StaticAbility> saGenerator) {
+        staticAbilities.add(saGenerator);
         return this;
     }
 

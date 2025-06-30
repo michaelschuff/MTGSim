@@ -1,7 +1,5 @@
 package org.koi.util;
 
-import org.koi.mana.Mana;
-
 public class Color {
 
 

@@ -2,7 +2,7 @@ package org.koi.event.mana;
 
 import org.koi.event.Event;
 import org.koi.game.MTGGame;
-import org.koi.mana.Mana;
+import org.koi.gameobject.mana.Mana;
 import org.koi.util.Player;
 
 import java.util.List;

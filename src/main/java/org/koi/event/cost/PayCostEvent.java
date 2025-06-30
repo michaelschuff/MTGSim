@@ -1,11 +1,11 @@
 package org.koi.event.cost;
 
-import org.koi.cost.Cost;
-import org.koi.cost.ManaCost;
-import org.koi.cost.Payable;
+import org.koi.gameobject.cost.Cost;
+import org.koi.gameobject.cost.ManaCost;
+import org.koi.gameobject.cost.Payable;
 import org.koi.event.Event;
 import org.koi.game.MTGGame;
-import org.koi.mana.ManaPool;
+import org.koi.gameobject.mana.ManaPool;
 import org.koi.util.Player;
 
 public class PayCostEvent extends Event {

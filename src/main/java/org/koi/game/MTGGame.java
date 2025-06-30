@@ -1,7 +1,9 @@
 package org.koi.game;
 
 import org.koi.event.EventManager;
-import org.koi.event.spell.ResolveStackOnce;
+import org.koi.event.spell.ResolveStackOnceEvent;
+import org.koi.event.spell.SpellWasCastEvent;
+import org.koi.event.statebasedactions.*;
 import org.koi.event.turn.*;
 import org.koi.event.turn.beginning.*;
 import org.koi.event.turn.combat.*;
@@ -13,15 +15,15 @@ import org.koi.event.turn.main.MainPostCombatPhaseBeginEvent;
 import org.koi.event.turn.main.MainPostCombatPhaseEndEvent;
 import org.koi.event.turn.main.MainPreCombatPhaseBeginEvent;
 import org.koi.event.turn.main.MainPreCombatPhaseEndEvent;
+import org.koi.event.turnbasedaction.*;
 import org.koi.event.zonechange.DrawCardEvent;
+import org.koi.event.zonechange.ObjectMoveZoneEvent;
 import org.koi.event.zonechange.action.ActivateAbilityEvent;
 import org.koi.event.zonechange.action.PlayLandEvent;
-import org.koi.gameobject.ability.ActivatedAbility;
 import org.koi.gameobject.card.Card;
 import org.koi.gameobject.card.OracleCard;
-import org.koi.turn.PhaseType;
-import org.koi.turn.TurnController;
-import org.koi.turnbasedaction.*;
+import org.koi.game.turn.PhaseType;
+import org.koi.game.turn.TurnController;
 import org.koi.util.GameObjectOrPlayer;
 import org.koi.util.Player;
 import org.koi.util.Variant;
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
 import static org.koi.cards.CardLoader.loadCard;
 
 public class MTGGame {
-    private TurnController turnController;
+    public TurnController turnController;
     public GameData data;
     public EventManager eventManager;
 
@@ -63,6 +65,7 @@ public class MTGGame {
         }
         this.data.setLibraries(decks);
         this.initTurnBasedActions();
+        this.initStateBasedActions();
     }
 
     public void start(List<List<String>> decklists) {
@@ -106,7 +109,6 @@ public class MTGGame {
                         Player prio_player = getPriorityPlayer();
                         // Loop until current player has passed
                         while (true) {
-                            checkStateBasedActions();
 
                             // TODO: flesh out player actions
                             boolean passed = false;
@@ -129,88 +131,22 @@ public class MTGGame {
                                         false);
                                 switch (input) {
                                     case 0: // pass
+                                        //TODO: Check for required actions
                                         passed = true;
                                         break;
                                     case 1: {
                                         // activate ability
-                                        List<Card> card_choices = data.battlefield.stream()
-                                                .filter((c) -> c.controller == prio_player
-                                                        && c.status.phasedIn
-                                                        && !c.abilities.activatedAbilities.isEmpty())
-                                                .collect(Collectors.toList());
-
-                                        int choice = getPlayerInputChoice(
-                                                prio_player,
-                                                "Choose a card with an ability to activate",
-                                                card_choices,
-                                                true);
-                                        Card source = card_choices.get(choice);
-                                        int ability_choice = getPlayerInputChoice(
-                                                prio_player,
-                                                "Choose an ability to activate",
-                                                source.abilities.activatedAbilities,
-                                                true);
-                                        if (ability_choice == -1) {
-                                            invalidInput = true;
-                                            System.out.println("Activate ability cancelled.");
-                                            break;
-                                        }
-
-
-                                        eventManager.addEvents(source.abilities.activatedAbilities.get(ability_choice).cost);
-                                        updateBoardState();
-                                        eventManager.addEvent(
-                                                new ActivateAbilityEvent(
-                                                        this, source, prio_player,
-                                                        source.abilities.activatedAbilities.get(ability_choice)
-                                                )
-                                        );
-                                        updateBoardState();
+                                        invalidInput = !AttemptAbilityActivation(prio_player);
                                         break;
                                     }
                                     case 2: {
                                         // cast spell
+                                        invalidInput = !AttemptSpellCast(prio_player);
                                         break;
                                     }
                                     case 3: {
                                         // special action
-                                        // TODO flesh out special actions
-                                        //      for now, only playing a land is allowed
-                                        if (prio_player != getActivePlayer()) {
-                                            invalidInput = true;
-                                            System.out.println("It is not your turn");
-                                            break;
-                                        }
-                                        if (turnController.getPhase() != PhaseType.Main1 && turnController.getPhase() != PhaseType.Main2) {
-                                            invalidInput = true;
-                                            System.out.println("You can only play lands during your main phase");
-                                            break;
-                                        }
-                                        if (prio_player.data.landsPlayedThisTurn >= prio_player.data.landDropsPerTurn) {
-                                            invalidInput = true;
-                                            System.out.println("You have used all of your land drops this turn.");
-                                            break;
-                                        }
-
-                                        List<Card> landsInHand = prio_player.data.hand.stream().filter((c) -> c.typeline.isType("Land")).collect(Collectors.toList());
-                                        if (landsInHand.isEmpty()) {
-                                            invalidInput = true;
-                                            System.out.println("You have no lands in hand");
-                                            break;
-                                        }
-                                        int land_choice = getPlayerInputChoice(
-                                                prio_player,
-                                                "Choose a land to play",
-                                                landsInHand,
-                                                true);
-                                        if (land_choice == -1) {
-                                            invalidInput = true;
-                                            System.out.println("Special action cancelled.");
-                                            break;
-                                        }
-                                        eventManager.addEvent(new PlayLandEvent(this, prio_player, landsInHand.get(land_choice)));
-                                        updateBoardState();
-                                        // Player keeps prio, let them go again
+                                        invalidInput = !AttemptSpecialAction(prio_player);
                                         break;
                                     }
                                 }
@@ -243,7 +179,7 @@ public class MTGGame {
                     if (!data.isStackEmpty()) {
                         // TODO: resolve it
                         eventManager.addEvent(
-                                new ResolveStackOnce(this)
+                                new ResolveStackOnceEvent(this)
                         );
                         updateBoardState();
                     } else {
@@ -256,8 +192,8 @@ public class MTGGame {
             // End of step
             // ============================================
             emitEndOfPhaseEvent(turnController.getPhase());
-            boolean turnEnded = turnController.IncPhase();
             updateBoardState();
+            boolean turnEnded = turnController.IncPhase();
             if (turnEnded) {
                 endOfTurn();
 
@@ -274,6 +210,192 @@ public class MTGGame {
         }
     }
 
+
+    // Returns whether the ability was successfully activated or not
+    private boolean AttemptAbilityActivation(Player activator) {
+        List<Card> card_choices = data.battlefield.stream()
+                .filter((c) -> canActivateAbility(activator, c))
+                .collect(Collectors.toList());
+
+        int choice = getPlayerInputChoice(
+                activator,
+                "Choose a card with an ability to activate",
+                card_choices,
+                true);
+        Card source = card_choices.get(choice);
+        int ability_choice = getPlayerInputChoice(
+                activator,
+                "Choose an ability to activate",
+                source.abilities.activatedAbilities,
+                true);
+        if (ability_choice == -1) {
+            System.out.println("Activate ability cancelled.");
+            return false;
+        }
+
+
+        eventManager.addEvents(source.abilities.activatedAbilities.get(ability_choice).cost);
+        updateBoardState();
+        eventManager.addEvent(
+                new ActivateAbilityEvent(
+                        this, source, activator,
+                        source.abilities.activatedAbilities.get(ability_choice)
+                )
+        );
+        updateBoardState();
+        return true;
+    }
+
+    // Returns whether the spell was successfully activated or not
+    private boolean AttemptSpellCast(Player caster) {
+        List<Card> card_choices = caster.data.hand.stream()
+                .filter((c) -> !c.typeline.isType("Land"))
+                .collect(Collectors.toList());
+
+        int choice = getPlayerInputChoice(
+                caster,
+                "Choose a card to cast",
+                card_choices,
+                true);
+        Card spell = card_choices.get(choice);
+
+        /** 601.2a
+         * Move the card onto the stack and apply any relevant continuous effects
+         */
+        eventManager.addEvent(
+                new ObjectMoveZoneEvent(
+                        this, caster.asGameObjectOrPlayer(),
+                        spell, caster.data.hand, data.theStack
+                )
+        );
+        eventManager.resolveEvents();
+
+        /**
+         * 601.2b
+         * TODO: Announce modal
+         * TODO: Announce splice
+         * TODO: Announce alternative/additional costs (buyback, kicker)
+         *       note: only 1 alternative method/alternative cost allowed
+         * TODO: Announce {X} values (and other variables)
+         *       note: if {X} would depend on a choice that would happen later
+         *       in these steps, then make that choice now
+         * TODO: Announce hybric mana cost choices
+         * TODO: Announce phyrexian mana cost choices
+         */
+
+        /**
+         * 601.2c.
+         * TODO: Announce selection of all appropriate targets
+         *       note: if variable amount of targets, then choose amount first
+         *              once determined, number of targets will not change
+         *       note: only choose the same object once per instance of the word "target"
+         *       note: if a target "must" be chosen, pick targets to satisfy the maximum amount
+         *              without violating any "cant be targeted"
+         * TODO: selected targets become targets, queue any triggered abilities
+         */
+
+        /**
+         * 601.2d.
+         * TODO: Divide or distribute damage or an effect.
+         *      note: each target must receive at least 1
+         */
+
+        /**
+         * 601.2e.
+         * Check if the spell can legally be cast.
+         * // TODO: If not, return to moment before it was cast
+         */
+        if (!canCastSpell(caster, spell)) {
+            // return here
+            // will involve moving spell back to hand
+            // and clearing queue of triggered events
+            // potentially even undoing any other events,
+            // if they replaced moving the spell onto the stack
+        }
+
+        /**
+         * 601.2f.
+         * TODO: Determine total cost. "Lock" it in
+         */
+
+        /**
+         * 601.2g.
+         * TODO: Allow player to activate mana abilities
+         */
+
+        /**
+         * 601.2h.
+         * TODO: Player pays all costs
+         *      note: first, pay costs that don't involve random elements or
+         *            moving objects from the library to a public zone, in any order
+         *      note: second, pay all remaining costs in any order. Partial payments are not allowed
+         *            unpayable costs can't be paid
+         */
+
+        /**
+         * 601.2i
+         * TODO: apply effects that modify characteristics of the spell, and the spell becomes "cast"
+         *       note: queue abilities that trigger of cast now
+         *       note: player receives priority again
+         */
+
+        eventManager.addEvent(new SpellWasCastEvent(this, spell));
+        updateBoardState();
+        return true;
+    }
+
+    private boolean AttemptSpecialAction(Player player) {
+        // TODO flesh out special actions
+        //      for now, only playing a land is allowed
+        if (player != getActivePlayer()) {
+            System.out.println("It is not your turn");
+            return false;
+        }
+        if (turnController.getPhase() != PhaseType.Main1 && turnController.getPhase() != PhaseType.Main2) {
+            System.out.println("You can only play lands during your main phase");
+            return false;
+        }
+        if (player.data.landsPlayedThisTurn >= player.data.landDropsPerTurn) {
+            System.out.println("You have used all of your land drops this turn.");
+            return false;
+        }
+
+        List<Card> landsInHand = player.data.hand.stream().filter((c) -> c.typeline.isType("Land")).collect(Collectors.toList());
+        if (landsInHand.isEmpty()) {
+            System.out.println("You have no lands in hand");
+            return false;
+        }
+        int land_choice = getPlayerInputChoice(
+                player,
+                "Choose a land to play",
+                landsInHand,
+                true);
+        if (land_choice == -1) {
+            System.out.println("Special action cancelled.");
+            return false;
+        }
+        eventManager.addEvent(new PlayLandEvent(this, player, landsInHand.get(land_choice)));
+        updateBoardState();
+
+
+        // Player keeps prio, let them go again
+        return false;
+    }
+
+
+    public boolean canCastSpell(Player p, Card c) {
+        /**
+         * 601.3.
+         * TODO: A player can begin to cast a spell iff
+         *           a rule allows them to and
+         *           no rule or effect disallows them to
+         */
+        return true;
+    }
+    public boolean canActivateAbility(Player p, Card c) {
+        return c.controller == p && c.status.phasedIn && !c.abilities.activatedAbilities.isEmpty();
+    }
+
     private void initTurnBasedActions() {
         eventManager.dispatcher.addTurnBasedActionListener(PhaseInForTurnAction.type, PhaseInForTurnAction.turnBasedAction);
         eventManager.dispatcher.addTurnBasedActionListener(UntapForTurnAction.type, UntapForTurnAction.turnBasedAction);
@@ -285,7 +407,21 @@ public class MTGGame {
         eventManager.dispatcher.addTurnBasedActionListener(DiscardToHandSizeTurnAction.type, DiscardToHandSizeTurnAction.turnBasedAction);
         eventManager.dispatcher.addTurnBasedActionListener(EndUntilEndOfTurnAndDamageTurnAction.type, EndUntilEndOfTurnAndDamageTurnAction.turnBasedAction);
         eventManager.dispatcher.addTurnBasedActionListener(EmptyManaPoolTurnAction.type, EmptyManaPoolTurnAction.turnBasedAction);
+        eventManager.dispatcher.addTurnBasedActionListener(ResetCombatStatusTurnAction.type, ResetCombatStatusTurnAction.turnBasedAction);
+    }
 
+    private void initStateBasedActions() {
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, PlayerZeroLifeSBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, DrawFromEmptyLibrarySBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, PoisonCountersSBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, IllegalTokenLocationsSBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, IllegalCopyLocationSBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, CreatureZeroToughnessSBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, CreatureDealtLethalDamageSBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, CreatureReceivedDeathtouchDamageSBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, PlaneswalkerZeroLoyaltySBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, LegendRuleSBA.get());
+        eventManager.dispatcher.addTurnBasedActionListener(PlayerGainPriorityEvent.class, WorldRuleSBA.get());
     }
 
     // Returns -1 if there were no options to choose from
@@ -482,13 +618,6 @@ public class MTGGame {
         eventManager.applyReplacementEffects(data.getReplacementEffects());
         eventManager.resolveEvents();
         data.updateBoardState();
-    }
-
-
-
-    public void checkStateBasedActions() {
-        this.data.updateBoardState();
-        // TODO: implement state based actions
     }
 
 

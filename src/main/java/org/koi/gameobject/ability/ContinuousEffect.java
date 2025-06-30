@@ -7,30 +7,27 @@ import org.koi.modification.Modification;
 import org.koi.util.Player;
 
 import java.util.List;
-import java.util.function.Function;
 
-public class ContinuousEffect {
+public abstract class ContinuousEffect {
     public Player controller;
     public Modification effect;
     public Card source;
-    public Function<Card, List<Card>> filter;
     public List<Card> affectedObjects = null;
     public final MTGGame game;
 
     public ContinuousEffect(MTGGame game,
                             Card source,
-                            Modification e,
-                            Function<Card, List<Card>> filter) {
+                            Modification e) {
         this.game = game;
         this.controller = source.controller;
         this.effect = e;
         this.source = source;
-        this.filter = filter;
     }
-    public void selectAffectedObjects() {
+    public void setAffectedObjects() {
         if (affectedObjects == null) {
-            this.affectedObjects = this.filter.apply(source);
+            affectedObjects = this.getSubjects();
         }
+//        return affectedObjects;
     }
 
     public void applyToObjects(LAYER l) {
@@ -39,4 +36,5 @@ public class ContinuousEffect {
             effect.apply(c, l);
         }
     }
+    public abstract List<Card> getSubjects();
 }

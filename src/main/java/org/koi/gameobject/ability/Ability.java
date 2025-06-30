@@ -1,14 +1,20 @@
 package org.koi.gameobject.ability;
 
 import org.koi.game.MTGGame;
+import org.koi.gameobject.card.Card;
 import org.koi.util.OID;
 import org.koi.util.Player;
 
 public abstract class Ability {
-    public Ability(MTGGame game) { }
+    public MTGGame game;
+    public Card source;
+    public Ability(MTGGame game, Card source) {
+        this.game = game;
+        this.source = source;
+    }
 
     @Override
     public String toString() {
-        return Ability.class.toString();
+        return this.getClass().toString();
     }
 }

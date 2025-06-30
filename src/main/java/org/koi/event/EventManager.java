@@ -49,11 +49,9 @@ public class EventManager {
 
     // TODO: This is way oversimplified
     public void applyReplacementEffects(List<StaticReplacementAbility> replacements) {
-        for (Event e : events) {
-            for (StaticReplacementAbility r : replacements) {
-                if (r.originalType.isInstance(e)) {
-                    e = r.replacement;
-                }
+        for (StaticReplacementAbility r : replacements) {
+            if (r.conditionalSuffix()) {
+                events = r.replace(events);
             }
         }
     }

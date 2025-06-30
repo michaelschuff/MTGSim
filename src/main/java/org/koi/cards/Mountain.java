@@ -1,17 +1,15 @@
 package org.koi.cards;
 
-import org.koi.cost.Cost;
-import org.koi.cost.ManaCostBuilder;
-import org.koi.cost.TapSelfCostEvent;
+import org.koi.gameobject.cost.Cost;
+import org.koi.gameobject.cost.ManaCostBuilder;
+import org.koi.gameobject.cost.TapSelfCostEvent;
 import org.koi.event.mana.AddManaEvent;
-import org.koi.event.status.TapCardEvent;
 import org.koi.game.MTGGame;
 import org.koi.gameobject.ability.OracleCardAbilitiesBuilder;
 import org.koi.gameobject.card.OracleCard;
 import org.koi.gameobject.ability.ActivatedAbility;
-import org.koi.gameobject.ability.CardAbilitiesBuilder;
 import org.koi.gameobject.typeline.TypelineBuilder;
-import org.koi.mana.Mana;
+import org.koi.gameobject.mana.Mana;
 import org.koi.util.Color;
 
 import java.util.List;
@@ -25,22 +23,23 @@ public abstract class Mountain {
                 new TypelineBuilder().basic().land().mountain().build(),
                 new ManaCostBuilder().build(),
                 new OracleCardAbilitiesBuilder().addActivatedAbility(
-                        (self) -> new ActivatedAbility(
+                        (card) -> new ActivatedAbility(
                                 game,
+                                card,
                                 new Cost(
                                         List.of(
                                                 new TapSelfCostEvent(
                                                         game,
-                                                        self
+                                                        card
                                                 )
                                         )
                                 ),
                                 List.of(
                                         new AddManaEvent(
                                                 game,
-                                                self,
-                                                self.controller,
-                                                new Mana(Color.RED, self)
+                                                card,
+                                                card.controller,
+                                                new Mana(Color.RED, card)
                                         )
                                 )
                         )

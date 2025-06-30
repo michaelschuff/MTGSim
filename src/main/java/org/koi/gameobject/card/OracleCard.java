@@ -1,6 +1,6 @@
 package org.koi.gameobject.card;
 
-import org.koi.cost.ManaCost;
+import org.koi.gameobject.cost.ManaCost;
 import org.koi.util.Color;
 import org.koi.gameobject.typeline.Typeline;
 import org.koi.util.OID;

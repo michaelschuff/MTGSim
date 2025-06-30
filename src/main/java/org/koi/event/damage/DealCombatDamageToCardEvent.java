@@ -6,9 +6,9 @@ import org.koi.util.GameObjectOrPlayer;
 
 public class DealCombatDamageToCardEvent extends DealDamageToCardEvent {
     public DealCombatDamageToCardEvent(MTGGame game,
-                                       GameObjectOrPlayer source,
+                                       Card source,
                                        Card target,
                                        int amount) {
-        super(game, source, target, amount);
+        super(game, source.asGameObjectOrPlayer(), target, amount);
     }
 }
