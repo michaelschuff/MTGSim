@@ -20,12 +20,12 @@ public class PowTou {
     public PowTou minus(PowTou o) {
         return new PowTou(this.power - o.power, this.toughness - o.toughness);
     }
-    public PowTou m1m1() {
-        return new PowTou(this.power - 1, this.toughness - 1);
-    }
-    public PowTou p1p1() {
-        return new PowTou(this.power + 1, this.toughness + 1);
-    }
+//    public PowTou m1m1() {
+//        return new PowTou(this.power - 1, this.toughness - 1);
+//    }
+//    public PowTou p1p1() {
+//        return new PowTou(this.power + 1, this.toughness + 1);
+//    }
 
 
 
