@@ -626,28 +626,4 @@ public class MTGGame {
         // TODO: empty mana pools
         // TODO: end of turn effects end
     }
-
-    public void resolveTopOfStack() {
-
-    }
-
-
-    // Thread Local stuff
-//    private static final ThreadLocal<MTGGame> _localStorage = new ThreadLocal<MTGGame>(){
-//        protected MTGGame initialValue() {
-//            return new MTGGame(Variant.Commander, List.of(List.of(),List.of(),List.of(),List.of()));
-//        }
-//    };
-//
-//    public static MTGGame getInstance() {
-//        return _localStorage.get();
-//    }
-//
-//    public static GameData data(){
-//        return _localStorage.get().gameData;
-//    }
-//
-//    public static void setInstance(Variant variant, List<List<OracleCard>> decklists){
-//        _localStorage.set(new MTGGame(variant, decklists));
-//    }
 }

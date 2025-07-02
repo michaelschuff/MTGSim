@@ -1,6 +1,7 @@
 package org.koi.modification;
 
 
+import jdk.jshell.spi.ExecutionControl;
 import org.koi.LAYER;
 import org.koi.game.MTGGame;
 import org.koi.gameobject.card.Card;
@@ -29,10 +30,11 @@ public class Modification {
 
 
     // Layer 1b - Face-down spells and permanents
-//    CardModifier morphDefiner; // maybe we dont do face down stuff
+    //TODO: add face down stuff (cr 708.2)
+//    CardModifier morphDefiner;
 
 
-    // Layer 1c - Characteristics become Copiable Values]
+    // Layer 1c - Characteristics become Copiable Values (not a real layer, but might be needed)
 
     // ==========================================================================================
     // Layer 2 - Control Changing Effects
@@ -43,7 +45,8 @@ public class Modification {
     // ==========================================================================================
     // Layer 3 - Text Changing Effects (Ability Modifying Effects?)
     // ==========================================================================================
-//    AbilityModifier textModifier; <- how the fuck
+    // TODO: implement
+//    AbilityModifier textModifier;
 
     // ==========================================================================================
     // Layer 4 - Type Changing Effects
@@ -87,10 +90,16 @@ public class Modification {
     // Layer 7d - Power/Toughness Swap Effects
     public final PowTouModifier powerToughnessSwap;
 
+    //TODO: add layer 8 which is all other effects, such as extra land drop or increase max hand size
+
+
+
     public boolean firstWorksOnLayer(LAYER l) {
         return l.ordinal() == lowestLayer.ordinal();
     }
 
+
+    //TODO: i dont think this needs to return card, just have it modify c in place
     public Card apply(Card c, LAYER l) {
         switch (l) {
             case L1a:
@@ -106,19 +115,23 @@ public class Modification {
                     c.typeline = this.cloneTypelineModifier.apply(c.typeline);
                 if (clonePowTouModifier != null)
                     c.pt = this.clonePowTouModifier.apply(c.pt);
+                //TODO: implement loyalty modifier, should use CounterStore
 //                if (cloneLoyaltyModifier != null)
 //                    c.loyalty = this.cloneLoyaltyModifier.apply(c.loyalty);
                 if (cloneAddAbilityModifier != null)
                     c.abilities = this.cloneAddAbilityModifier.apply(c.abilities);
                 if (cloneRemoveAbilityModifier != null)
                     c.abilities = this.cloneRemoveAbilityModifier.apply(c.abilities);
+                // TODO: implement. need some way of comparing abilities
 //                if (cloneCannotGainAbilityModifier != null)
 //                    c.bannedAbilities = this.cloneCannotGainAbilityModifier.apply(c.bannedAbilities);
                 return c;
 
             case L1b:
+                //TODO: apply face down modifier (cr 708.2)
                 return c;
             case L1c:
+                //TODO: set copiable values as characteristic
                 return c;
             case L2:
                 if (controllerModifier != null)

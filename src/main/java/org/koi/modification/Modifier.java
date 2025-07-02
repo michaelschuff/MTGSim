@@ -10,10 +10,6 @@ public abstract class Modifier<T> implements IModifier<T> {
         SWAP
     }
 
-
-    public Modifier() {
-    }
-
     protected abstract T getValue();
 
 }

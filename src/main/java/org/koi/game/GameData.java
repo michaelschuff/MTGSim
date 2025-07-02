@@ -8,7 +8,6 @@ import org.koi.gameobject.card.CARD_STATUS_TYPE;
 import org.koi.gameobject.card.Card;
 import org.koi.gameobject.card.OracleCard;
 import org.koi.gameobject.mana.Mana;
-import org.koi.util.OID;
 import org.koi.util.Player;
 
 import java.util.*;
@@ -21,8 +20,8 @@ public class GameData {
     public final MTGStack theStack;
     public final Exile exile;
     public final CommandZone commandZone;
-    public final HashMap<OID, Card> cardMap;
-    public final HashMap<OID, StackAbility> abilityMap;
+    public final HashMap<UUID, Card> cardMap;
+    public final HashMap<UUID, StackAbility> abilityMap;
     public final List<Player> players;
     public final TimestampGenerator timestampGen;
     public List<ContinuousEffect> continuousEffects;

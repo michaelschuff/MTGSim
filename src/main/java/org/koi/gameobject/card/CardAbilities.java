@@ -50,4 +50,8 @@ public class CardAbilities {
         this.triggeredAbilities.removeAll(ca.triggeredAbilities);
         this.staticAbilities.removeAll(ca.staticAbilities);
     }
+
+    public int size() {
+        return activatedAbilities.size() + spellAbilities.size() + triggeredAbilities.size() + staticAbilities.size();
+    }
 }

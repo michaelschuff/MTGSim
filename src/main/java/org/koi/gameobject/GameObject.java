@@ -1,11 +1,12 @@
 package org.koi.gameobject;
 
 import org.koi.util.GameObjectOrPlayer;
-import org.koi.util.OID;
+
+import java.util.UUID;
 
 public abstract class GameObject {
     public int timestamp;
-    public OID id = new OID();
+    public UUID id = UUID.randomUUID();
 
 
     public GameObject(int timestamp) {

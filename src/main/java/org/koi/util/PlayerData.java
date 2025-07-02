@@ -26,10 +26,4 @@ public class PlayerData {
     public boolean drewFromEmptyLibraryFlag = false;
 
     public boolean hasLost = false;
-
-
-    public PlayerData() {
-
-    }
-
 }

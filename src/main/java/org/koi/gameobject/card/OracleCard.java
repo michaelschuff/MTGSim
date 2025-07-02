@@ -3,7 +3,8 @@ package org.koi.gameobject.card;
 import org.koi.gameobject.cost.ManaCost;
 import org.koi.util.Color;
 import org.koi.gameobject.typeline.Typeline;
-import org.koi.util.OID;
+
+import java.util.UUID;
 
 // represents an actual printed MTG card
 public class OracleCard {
@@ -14,7 +15,7 @@ public class OracleCard {
     public final Typeline typeline;
     public final ManaCost manaCost;
     public final OracleCardAbilities abilities;
-    public final OID id = new OID();
+    public final UUID id = UUID.randomUUID();
 
     public OracleCard(String name,
                       int power,

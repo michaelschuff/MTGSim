@@ -2,8 +2,6 @@ package org.koi.gameobject.ability;
 
 import org.koi.game.MTGGame;
 import org.koi.gameobject.card.Card;
-import org.koi.util.OID;
-import org.koi.util.Player;
 
 public abstract class Ability {
     public MTGGame game;
